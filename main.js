@@ -9,7 +9,7 @@
 const utils = require('@iobroker/adapter-core');
 const Gree = require('gree-hvac-client');
 
-// Load your modules here, e.g.:
+// Load your modules here, e.g.:\
 // const fs = require("fs");
 
 class GreeAircon extends utils.Adapter {
@@ -78,8 +78,15 @@ class GreeAircon extends utils.Adapter {
 			this.setStateAsync('lights', updatedProperties.lights == 'on' ? true : false, true);
 		if ('temperature' in updatedProperties)
 			this.setStateAsync('temperature', updatedProperties.temperature, true);
-		if ('currentTemperature' in updatedProperties)
-			this.setStateAsync('currentTemperature', updatedProperties.currentTemperature, true);
+		if ('currentTemperature' in updatedProperties) {
+			// Many devices report TemSen=0 when the sensor value is unavailable.
+			// Only update the state when the device delivers a plausible value (> 0).
+			if (updatedProperties.currentTemperature > 0) {
+				this.setStateAsync('currentTemperature', updatedProperties.currentTemperature, true);
+			} else {
+				this.log.debug('currentTemperature ignored: device reported 0 (TemSen not available)');
+			}
+		}
 		if ('power' in updatedProperties)
 			this.setStateAsync('power', updatedProperties.power == 'on', true);
 		if ('mode' in updatedProperties)
@@ -172,14 +179,6 @@ class GreeAircon extends utils.Adapter {
 						this.setStateAsync('temperature', state.val, true);//ack 
 						break;
 					}
-					case 'currentTemperature': {
-						const properties = {};
-						properties[Gree.PROPERTY.currentTemperature] = state.val;
-						properties[Gree.PROPERTY.temperatureUnit] = Gree.VALUE.temperatureUnit.celsius;
-						this.Greeclient.setProperties(properties);
-						this.setStateAsync('currentTemperature', state.val, true);//ack 
-						break;
-					}
 					case 'mode': {
 						if (!['auto', 'cool', 'heat', 'dry', 'fan_only'].includes(state.val)) {
 							this.log.error(`tried to set bad value for ${propName}:"${state.val}". Source:${state.from}`);
@@ -258,7 +257,7 @@ class GreeAircon extends utils.Adapter {
 						}
 						this.Greeclient.setProperty(Gree.PROPERTY.swingVert, state.val);
 						this.setStateAsync('swingVert', state.val, true);//ack...
-						break;						
+						break;					
 					}
 					case 'swingHor': {
 						if (!['default', 'full', 'fixedLeft', 'fixedMidLeft', 'fixedMid', 'fixedMidRight', 'fixedRight', 'fullAlt'].includes(state.val)) {
@@ -269,7 +268,7 @@ class GreeAircon extends utils.Adapter {
 						this.Greeclient.setProperty(Gree.PROPERTY.swingHor, state.val);
 						this.setStateAsync('swingHor', state.val, true);//ack...
 						break;
-					}						
+					}				
 				}
 
 			}
@@ -279,23 +278,6 @@ class GreeAircon extends utils.Adapter {
 			//this.log.info(`state ${id} deleted`);
 		}
 	}
-
-	// /**
-	//  * Some message was sent to this instance over message box. Used by email, pushover, text2speech, ...
-	//  * Using this method requires "common.message" property to be set to true in io-package.json
-	//  * @param {ioBroker.Message} obj
-	//  */
-	// onMessage(obj) {
-	// 	if (typeof obj === 'object' && obj.message) {
-	// 		if (obj.command === 'send') {
-	// 			// e.g. send email or pushover or whatever
-	// 			this.log.info('send command');
-
-	// 			// Send response in callback if required
-	// 			if (obj.callback) this.sendTo(obj.from, obj.command, 'Message received', obj.callback);
-	// 		}
-	// 	}
-	// }
 
 }
 
