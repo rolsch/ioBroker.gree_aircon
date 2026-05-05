@@ -91,7 +91,6 @@
 			},
 			"native": {}
 		},
-
 		{
 			"_id": "power",
 			"type": "state",
@@ -135,15 +134,15 @@
 			"_id": "currentTemperature",
 			"type": "state",
 			"common": {
-				"role": "value.currentTemperature",
-				"name": "Temperature",
+				"role": "value.temperature",
+				"name": "Current room temperature",
 				"type": "number",
 				"read": true,
 				"write": false,
 				"def": -10
 			},
 			"native": {}
-		},		
+		},
 		{
 			"_id": "mode",
 			"type": "state",
@@ -274,12 +273,12 @@
 			},
 			"native": {}
 		},
-				{
+		{
 			"_id": "swingVert",
 			"type": "state",
 			"common": {
 				"role": "",
-				"name": "swingVert one of (default, full, fixedTop, fixedMidTop, fixedMid, fixedMidBottom, fixedBottom)",
+				"name": "swingVert one of (default, full, fixedTop, fixedMidTop, fixedMid, fixedMidBottom, fixedBottom, swingBottom, swingMidBottom, swingMid, swingMidTop, swingTop)",
 				"type": "string",
 				"read": true,
 				"write": true,
@@ -287,6 +286,5 @@
 			},
 			"native": {}
 		}
-		
 	]
 }
