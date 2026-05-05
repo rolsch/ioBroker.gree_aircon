@@ -94,12 +94,12 @@ class GreeAircon extends utils.Adapter {
 		if ('temperature' in updatedProperties)
 			this.setStateAsync('temperature', updatedProperties.temperature, true);
 		if ('currentTemperature' in updatedProperties) {
-			// Many devices report TemSen=0 when the sensor value is unavailable.
-			// Only update the state when the device delivers a plausible value (> 0).
-			if (updatedProperties.currentTemperature > 0) {
+			// The gree-hvac-client returns null when TemSen=0 (sensor not available).
+			// Only update the state when a real value is delivered.
+			if (updatedProperties.currentTemperature !== null) {
 				this.setStateAsync('currentTemperature', updatedProperties.currentTemperature, true);
 			} else {
-				this.log.debug('currentTemperature ignored: device reported 0 (TemSen not available)');
+				this.log.debug('currentTemperature ignored: TemSen not available (null)');
 			}
 		}
 		if ('power' in updatedProperties)
