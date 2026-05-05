@@ -9,8 +9,23 @@
 const utils = require('@iobroker/adapter-core');
 const Gree = require('gree-hvac-client');
 
-// Load your modules here, e.g.:\
+// Load your modules here, e.g.:
 // const fs = require("fs");
+
+const SWING_VERT_VALUES = [
+	'default',
+	'full',
+	'fixedTop',
+	'fixedMidTop',
+	'fixedMid',
+	'fixedMidBottom',
+	'fixedBottom',
+	'swingBottom',
+	'swingMidBottom',
+	'swingMid',
+	'swingMidTop',
+	'swingTop'
+];
 
 class GreeAircon extends utils.Adapter {
 
@@ -250,14 +265,14 @@ class GreeAircon extends utils.Adapter {
 						break;
 					}
 					case 'swingVert': {
-						if (!['default', 'full', 'fixedTop', 'fixedMidTop', 'fixedMid', 'fixedMidBottom', 'fixedBottom', 'full'].includes(state.val)) {
+						if (!SWING_VERT_VALUES.includes(state.val)) {
 							this.log.error(`tried to set bad value for ${propName}:"${state.val}". Source:${state.from}`);
 							this.setStateAsync('swingVert', this.currentProperties.swingVert, true);//ack...
 							break;
 						}
 						this.Greeclient.setProperty(Gree.PROPERTY.swingVert, state.val);
 						this.setStateAsync('swingVert', state.val, true);//ack...
-						break;					
+						break;
 					}
 					case 'swingHor': {
 						if (!['default', 'full', 'fixedLeft', 'fixedMidLeft', 'fixedMid', 'fixedMidRight', 'fixedRight', 'fullAlt'].includes(state.val)) {
@@ -268,7 +283,7 @@ class GreeAircon extends utils.Adapter {
 						this.Greeclient.setProperty(Gree.PROPERTY.swingHor, state.val);
 						this.setStateAsync('swingHor', state.val, true);//ack...
 						break;
-					}				
+					}
 				}
 
 			}
